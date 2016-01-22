@@ -14,15 +14,11 @@ void LightPointEmission::render(const sf::View &view, sf::RenderTexture &lightTe
     LightSystem::clear(emissionTempTexture, sf::Color::Black);
 
     emissionTempTexture.setView(view);
-
     emissionTempTexture.draw(_emissionSprite);
-
     emissionTempTexture.display();
 
     LightSystem::clear(lightTempTexture, sf::Color::Black);
-
     lightTempTexture.setView(view);
-
     lightTempTexture.draw(_emissionSprite);
 
     sf::Transform t;
@@ -41,15 +37,25 @@ void LightPointEmission::render(const sf::View &view, sf::RenderTexture &lightTe
 
     std::vector<OuterEdges> outerEdges(shapes.size());
 
+    std::vector<int> innerBoundaryIndices;
+    std::vector<sf::Vector2f> innerBoundaryVectors;
+    std::vector<LightSystem::Penumbra> penumbras;
+
+    sf::RenderStates maskRenderStates;
+    maskRenderStates.blendMode = sf::BlendNone;
+
+    sf::RenderStates antumbraRenderStates;
+    antumbraRenderStates.blendMode = sf::BlendMultiply;
+
     // Mask off light shape (over-masking - mask too much, reveal penumbra/antumbra afterwards)
-    for (int i = 0; i < shapes.size(); i++) {
+    unsigned shapesCount = shapes.size();
+    for (unsigned i = 0; i < shapesCount; ++i) {
         LightShape* pLightShape = static_cast<LightShape*>(shapes[i]);
 
         // Get boundaries
-        std::vector<int> innerBoundaryIndices;
-        std::vector<sf::Vector2f> innerBoundaryVectors;
-        std::vector<LightSystem::Penumbra> penumbras;
-
+        innerBoundaryIndices.clear();
+        innerBoundaryVectors.clear();
+        penumbras.clear();
         LightSystem::getPenumbrasPoint(penumbras, innerBoundaryIndices, innerBoundaryVectors, outerEdges[i]._outerBoundaryIndices, outerEdges[i]._outerBoundaryVectors, pLightShape->_shape, castCenter, _sourceRadius);
 
         if (innerBoundaryIndices.size() != 2 || outerEdges[i]._outerBoundaryIndices.size() != 2)
@@ -58,12 +64,8 @@ void LightPointEmission::render(const sf::View &view, sf::RenderTexture &lightTe
         // Render shape
         if (!pLightShape->_renderLightOverShape) {
             pLightShape->_shape.setFillColor(sf::Color::Black);
-
             lightTempTexture.draw(pLightShape->_shape);
         }
-
-        sf::RenderStates maskRenderStates;
-        maskRenderStates.blendMode = sf::BlendNone;
 
         sf::Vector2f as = pLightShape->_shape.getTransform().transformPoint(pLightShape->_shape.getPoint(outerEdges[i]._outerBoundaryIndices[0]));
         sf::Vector2f bs = pLightShape->_shape.getTransform().transformPoint(pLightShape->_shape.getPoint(outerEdges[i]._outerBoundaryIndices[1]));
@@ -143,8 +145,6 @@ void LightPointEmission::render(const sf::View &view, sf::RenderTexture &lightTe
             antumbraTempTexture.display();
 
             // Multiply back to lightTempTexture
-            sf::RenderStates antumbraRenderStates;
-            antumbraRenderStates.blendMode = sf::BlendMultiply;
 
             sf::Sprite s;
 
