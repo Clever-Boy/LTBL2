@@ -97,9 +97,9 @@ void DynamicQuadtree::contract() {
     int maxIndex = 0;
 
     for (int i = 1; i < 4; i++)
-    if (_pRootNode->_children[i]->getNumOccupantsBelow() >
-        _pRootNode->_children[maxIndex]->getNumOccupantsBelow())
-        maxIndex = i;
+        if (_pRootNode->_children[i]->getNumOccupantsBelow() >
+            _pRootNode->_children[maxIndex]->getNumOccupantsBelow())
+            maxIndex = i;
 
     // Reorganize
     for (int i = 0; i < 4; i++) {
