@@ -2,6 +2,8 @@
 
 #include <ltbl/lighting/LightSystem.h>
 
+#include <sstream>
+
 #define SHAPES_COUNT 500u
 
 int main(void)
@@ -72,6 +74,17 @@ int main(void)
         ls.addShape(lightBlocker);
     }
 
+    //----- Efficiency counter
+    sf::Clock globalClock, clock;
+    sf::Time globalTime, time;
+    sf::Text text;
+    sf::Font font;
+    font.loadFromFile("assets/monofur.ttf");
+    text.setFont(font);
+    text.setCharacterSize(20);
+    text.setPosition(10.f, 10.f);
+    text.setColor(sf::Color::White);
+
     //----- Program loop
 
     bool quit = false;
@@ -101,20 +114,33 @@ int main(void)
         }
 
         // Normal rendering
-
         window.clear(sf::Color::White);
-
         for (unsigned i = 0u; i < SHAPES_COUNT; ++i)
             window.draw(blockers[i]);
-
         window.draw(pointLight);
 
         // Lighting rendering
-
+        clock.restart();
         ls.render(view, unshadowShader, lightOverShapeShader);
+        time += clock.getElapsedTime();
 
         sf::Sprite sprite(ls.getLightingTexture());
         window.draw(sprite, lightRenderStates);
+
+        // Counter
+        globalTime += globalClock.getElapsedTime();
+        globalClock.restart();
+
+        if (globalTime.asSeconds() >= 1.f) {
+            std::wstringstream str;
+            str << L"Light rendering time per second: " << time.asMilliseconds() << L" ms" << std::endl;
+            text.setString(str.str());
+
+            globalTime -= sf::seconds(1.f);
+            time = sf::Time::Zero;
+        }
+
+        window.draw(text);
 
         window.display();
     }

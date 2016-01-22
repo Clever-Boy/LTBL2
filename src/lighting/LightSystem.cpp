@@ -631,25 +631,26 @@ void LightSystem::render(const sf::View &view, sf::Shader &unshadowShader, sf::S
 
     _lightPointEmissionQuadtree.queryRegion(viewPointEmissionLights, viewBounds);
 
-    for (int l = 0; l < viewPointEmissionLights.size(); l++) {
-        LightPointEmission* pPointEmissionLight = static_cast<LightPointEmission*>(viewPointEmissionLights[l]);
+    sf::RenderStates compoRenderStates;
+    compoRenderStates.blendMode = sf::BlendAdd;
+
+    //----- Point lights
+
+    std::vector<QuadtreeOccupant*> lightShapes;
+    sf::Sprite lightTempSprite(_lightTempTexture.getTexture());
+
+    for (auto occupant : viewPointEmissionLights) {
+        auto pPointEmissionLight = static_cast<LightPointEmission*>(occupant);
 
         // Query shapes this light is affected by
-        std::vector<QuadtreeOccupant*> lightShapes;
-
+        lightShapes.clear();
         _shapeQuadtree.queryRegion(lightShapes, pPointEmissionLight->getAABB());
 
         pPointEmissionLight->render(view, _lightTempTexture, _emissionTempTexture, _antumbraTempTexture, lightShapes, unshadowShader, lightOverShapeShader);
-
-        sf::Sprite sprite;
-
-        sprite.setTexture(_lightTempTexture.getTexture());
-
-        sf::RenderStates compoRenderStates;
-        compoRenderStates.blendMode = sf::BlendAdd;
-
-        _compositionTexture.draw(sprite, compoRenderStates);
+        _compositionTexture.draw(lightTempSprite, compoRenderStates);
     }
+
+    //----- Direction lights
 
     for (const auto& directionEmissionLight : _directionEmissionLights) {
         LightDirectionEmission* pDirectionEmissionLight = directionEmissionLight.get();
@@ -678,9 +679,6 @@ void LightSystem::render(const sf::View &view, sf::Shader &unshadowShader, sf::S
         sf::Sprite sprite;
 
         sprite.setTexture(_lightTempTexture.getTexture());
-
-        sf::RenderStates compoRenderStates;
-        compoRenderStates.blendMode = sf::BlendAdd;
 
         _compositionTexture.draw(sprite, compoRenderStates);
     }
