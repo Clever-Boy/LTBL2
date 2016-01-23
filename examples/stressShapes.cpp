@@ -64,7 +64,7 @@ int main(void)
         blockers[i].setPosition(rand() % screenSize.x, rand() % screenSize.y);
         blockers[i].setFillColor(sf::Color{rand() % 256, rand() % 256, rand() % 256});
 
-        auto lightBlocker = std::make_shared<ltbl::LightShape>();
+        auto lightBlocker = ls.allocateShape();
         lightBlocker->_shape.setPointCount(4u);
         lightBlocker->_shape.setPoint(0u, {0.f, 0.f});
         lightBlocker->_shape.setPoint(1u, {0.f, blockers[i].getSize().y});

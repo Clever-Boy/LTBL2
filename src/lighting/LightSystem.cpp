@@ -686,20 +686,24 @@ void LightSystem::render(const sf::View &view, sf::Shader &unshadowShader, sf::S
     _compositionTexture.display();
 }
 
-void LightSystem::addShape(const std::shared_ptr<LightShape> &lightShape) {
-    _shapeQuadtree.add(lightShape.get());
-
-    _lightShapes.insert(lightShape);
+LightShape* LightSystem::allocateShape()
+{
+    return _lightShapesPool.newElement();
 }
 
-void LightSystem::removeShape(const std::shared_ptr<LightShape> &lightShape) {
-    std::unordered_set<std::shared_ptr<LightShape>>::iterator it = _lightShapes.find(lightShape);
+void LightSystem::deallocateShape(LightShape* pLightShape)
+{
+    _lightShapesPool.deleteElement(pLightShape);
+}
 
-    if (it != _lightShapes.end()) {
-        (*it)->quadtreeRemove();
+void LightSystem::addShape(LightShape* pLightShape)
+{
+    _shapeQuadtree.add(pLightShape);
+}
 
-        _lightShapes.erase(it);
-    }
+void LightSystem::removeShape(LightShape* pLightShape)
+{
+    pLightShape->quadtreeRemove();
 }
 
 void LightSystem::addLight(const std::shared_ptr<LightPointEmission> &pointEmissionLight) {

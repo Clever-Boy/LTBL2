@@ -53,7 +53,7 @@ int main(void)
     blocker.setPosition(500.f, 300.f);
     blocker.setFillColor(sf::Color::Red);
 
-    auto lightBlocker = std::make_shared<ltbl::LightShape>();
+    auto lightBlocker = ls.allocateShape();
     lightBlocker->_shape.setPointCount(4u);
     lightBlocker->_shape.setPoint(0u, {0.f, 0.f});
     lightBlocker->_shape.setPoint(1u, {0.f, blocker.getSize().y});
