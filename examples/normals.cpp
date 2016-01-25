@@ -2,21 +2,13 @@
 
 #include <ltbl/lighting/LightSystem.h>
 
-#include <sstream>
-
-#define SHAPES_COUNT 500u
-
 int main(void)
 {
-    sf::Vector2u screenSize{1280u, 720u};
-
     sf::RenderWindow window;
     window.setVerticalSyncEnabled(true);
-    window.create(sf::VideoMode(screenSize.x, screenSize.y), "LTBL - Examples - Basic", sf::Style::Close);
+    window.create(sf::VideoMode(1280, 720), "LTBL - Examples - Basic", sf::Style::Close);
 
     sf::View view = window.getDefaultView();
-
-    srand(time(nullptr));
 
     //----- Initialize the light system
 
@@ -53,36 +45,25 @@ int main(void)
     light->_emissionSprite.setPosition(100.0f, 100.0f);
     ls.addLight(light);
 
-    //----- Add a square blocking light
+    //----- Add a texture with normal mapping
 
-    std::vector<sf::RectangleShape> blockers;
-    blockers.resize(SHAPES_COUNT);
+    sf::Texture headTexture;
+    headTexture.loadFromFile("resources/head.png");
+    headTexture.setSmooth(true);
+    sf::Vector2f headTextureSize(headTexture.getSize().x, headTexture.getSize().y);
 
-    for (unsigned i = 0u; i < SHAPES_COUNT; ++i) {
-        blockers[i].setSize({10.f + (rand() % 30), 5.f + (rand() % 50)});
-        blockers[i].setPosition(rand() % screenSize.x, rand() % screenSize.y);
-        blockers[i].setFillColor(sf::Color{rand() % 256, rand() % 256, rand() % 256});
+    sf::Sprite head(headTexture);
+    head.setOrigin(headTextureSize / 2.f);
+    head.setPosition(view.getCenter());
 
-        auto lightBlocker = ls.allocateShape();
-        lightBlocker->_shape.setPointCount(4u);
-        lightBlocker->_shape.setPoint(0u, {0.f, 0.f});
-        lightBlocker->_shape.setPoint(1u, {0.f, blockers[i].getSize().y});
-        lightBlocker->_shape.setPoint(2u, blockers[i].getSize());
-        lightBlocker->_shape.setPoint(3u, {blockers[i].getSize().x, 0.f});
-        lightBlocker->_shape.setPosition(blockers[i].getPosition());
-        ls.addShape(lightBlocker);
-    }
+    sf::Texture headNormalsTexture;
+    headNormalsTexture.loadFromFile("resources/head_NORMALS.png");
 
-    //----- Efficiency counter
-    sf::Clock globalClock, clock;
-    sf::Time globalTime, time;
-    sf::Text text;
-    sf::Font font;
-    font.loadFromFile("assets/monofur.ttf");
-    text.setFont(font);
-    text.setCharacterSize(20);
-    text.setPosition(10.f, 10.f);
-    text.setColor(sf::Color::White);
+    auto headNormals = std::make_shared<ltbl::NormalsSprite>();
+    headNormals->_normalsSprite.setTexture(headNormalsTexture);
+    headNormals->_normalsSprite.setOrigin(head.getOrigin());
+    headNormals->_normalsSprite.setPosition(head.getPosition());
+    ls.addNormals(headNormals);
 
     //----- Program loop
 
@@ -113,33 +94,17 @@ int main(void)
         }
 
         // Normal rendering
+
         window.clear(sf::Color::White);
-        for (unsigned i = 0u; i < SHAPES_COUNT; ++i)
-            window.draw(blockers[i]);
+        window.draw(head);
         window.draw(pointLight);
 
         // Lighting rendering
-        clock.restart();
+
         ls.render(view, unshadowShader, lightOverShapeShader, normalsShader);
-        time += clock.getElapsedTime();
 
         sf::Sprite sprite(ls.getLightingTexture());
         window.draw(sprite, lightRenderStates);
-
-        // Counter
-        globalTime += globalClock.getElapsedTime();
-        globalClock.restart();
-
-        if (globalTime  .asSeconds() >= 1.f) {
-            std::wstringstream str;
-            str << L"Light rendering time per second: " << time.asMilliseconds() << L" ms" << std::endl;
-            text.setString(str.str());
-
-            globalTime -= sf::seconds(1.f);
-            time = sf::Time::Zero;
-        }
-
-        window.draw(text);
 
         window.display();
     }

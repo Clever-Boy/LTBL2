@@ -1,5 +1,9 @@
 include_directories(.)
 
+set(normals_src normals.cpp)
+add_executable(normals ${normals_src})
+target_link_libraries(normals ltbl ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
+
 set(basic_src basic.cpp)
 add_executable(basic ${basic_src})
 target_link_libraries(basic ltbl ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})

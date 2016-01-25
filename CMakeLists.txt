@@ -55,7 +55,6 @@ set(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib")
 set(ltbl_src
     src/lighting/LightDirectionEmission.cpp
     src/lighting/LightPointEmission.cpp
-    src/lighting/LightShape.cpp
     src/lighting/LightSystem.cpp
     src/Math.cpp
     src/quadtree/DynamicQuadtree.cpp

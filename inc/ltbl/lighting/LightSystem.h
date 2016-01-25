@@ -4,6 +4,7 @@
 #include <ltbl/lighting/LightPointEmission.h>
 #include <ltbl/lighting/LightDirectionEmission.h>
 #include <ltbl/lighting/LightShape.h>
+#include <ltbl/lighting/NormalsSprite.h>
 
 #include <pool/pool.h>
 
@@ -31,6 +32,7 @@ namespace ltbl {
         static void clear(sf::RenderTarget &rt, const sf::Color &color);
 
         DynamicQuadtree _shapeQuadtree;
+        DynamicQuadtree _normalsQuadtree;
         DynamicQuadtree _lightPointEmissionQuadtree;
 
         std::unordered_set<std::shared_ptr<LightPointEmission>> _pointEmissionLights;
@@ -51,9 +53,12 @@ namespace ltbl {
             : _directionEmissionRange(10000.0f), _directionEmissionRadiusMultiplier(1.1f), _ambientColor(sf::Color(16, 16, 16))
         {}
 
-        void create(const sf::FloatRect &rootRegion, const sf::Vector2u &imageSize, const sf::Texture &penumbraTexture, sf::Shader &unshadowShader, sf::Shader &lightOverShapeShader);
+        void create(const sf::FloatRect& rootRegion, const sf::Vector2u& imageSize,
+                    const sf::Texture& penumbraTexture,
+                    sf::Shader& unshadowShader, sf::Shader& lightOverShapeShader, sf::Shader& normalsShader);
 
-        void render(const sf::View &view, sf::Shader &unshadowShader, sf::Shader &lightOverShapeShader);
+        void render(const sf::View &view,
+                    sf::Shader &unshadowShader, sf::Shader &lightOverShapeShader, sf::Shader& normalsShader);
 
         //! Request a new shape from the pool.
         LightShape* allocateShape();
@@ -72,6 +77,10 @@ namespace ltbl {
 
         void removeLight(const std::shared_ptr<LightPointEmission> &pointEmissionLight);
         void removeLight(const std::shared_ptr<LightDirectionEmission> &directionEmissionLight);
+
+        void addNormals(const std::shared_ptr<NormalsSprite>& normalsSprite);
+
+        void removeNormals(const std::shared_ptr<NormalsSprite>& normalsSprite);
 
         void trimLightPointEmissionQuadtree() {
             _lightPointEmissionQuadtree.trim();

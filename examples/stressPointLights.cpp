@@ -27,14 +27,13 @@ int main(void)
     penumbraTexture.loadFromFile("assets/penumbraTexture.png");
     penumbraTexture.setSmooth(true);
 
-    sf::Shader unshadowShader;
-    unshadowShader.loadFromFile("assets/unshadowShader.vert", "assets/unshadowShader.frag");
-
-    sf::Shader lightOverShapeShader;
-    lightOverShapeShader.loadFromFile("assets/lightOverShapeShader.vert", "assets/lightOverShapeShader.frag");
+    sf::Shader unshadowShader, lightOverShapeShader, normalsShader;
+    unshadowShader.loadFromFile("assets/unshadowShader.frag", sf::Shader::Fragment);
+    lightOverShapeShader.loadFromFile("assets/lightOverShapeShader.frag", sf::Shader::Fragment);
+    normalsShader.loadFromFile("assets/normalsShader.frag", sf::Shader::Fragment);
 
     ltbl::LightSystem ls;
-    ls.create(sf::FloatRect{{0.f, 0.f}, view.getSize()}, window.getSize(), penumbraTexture, unshadowShader, lightOverShapeShader);
+    ls.create(sf::FloatRect{{0.f, 0.f}, view.getSize()}, window.getSize(), penumbraTexture, unshadowShader, lightOverShapeShader, normalsShader);
 
     //----- Add a light
 
@@ -109,7 +108,7 @@ int main(void)
 
         // Lighting rendering
         clock.restart();
-        ls.render(view, unshadowShader, lightOverShapeShader);
+        ls.render(view, unshadowShader, lightOverShapeShader, normalsShader);
         time += clock.getElapsedTime();
 
         sf::Sprite sprite(ls.getLightingTexture());
