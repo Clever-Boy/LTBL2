@@ -10,8 +10,14 @@
 
 #include <unordered_set>
 
-namespace ltbl {
-    class LightSystem : sf::NonCopyable {
+namespace ltbl
+{
+    class LightSystem : sf::NonCopyable
+    {
+        friend class LightPointEmission;
+        friend class LightDirectionEmission;
+        friend class LightShape;
+
     public:
         struct Penumbra {
             sf::Vector2f _source;
@@ -24,7 +30,7 @@ namespace ltbl {
         };
 
     private:
-        sf::RenderTexture _lightTempTexture, _emissionTempTexture, _antumbraTempTexture, _compositionTexture;
+        sf::RenderTexture _lightTempTexture, _emissionTempTexture, _antumbraTempTexture, _compositionTexture, _normalsTexture;
 
         static void getPenumbrasPoint(std::vector<Penumbra> &penumbras, std::vector<int> &innerBoundaryIndices, std::vector<sf::Vector2f> &innerBoundaryVectors, std::vector<int> &outerBoundaryIndices, std::vector<sf::Vector2f> &outerBoundaryVectors, const sf::ConvexShape &shape, const sf::Vector2f &sourceCenter, float sourceRadius);
         static void getPenumbrasDirection(std::vector<Penumbra> &penumbras, std::vector<int> &innerBoundaryIndices, std::vector<sf::Vector2f> &innerBoundaryVectors, std::vector<int> &outerBoundaryIndices, std::vector<sf::Vector2f> &outerBoundaryVectors, const sf::ConvexShape &shape, const sf::Vector2f &sourceDirection, float sourceRadius, float sourceDistance);
@@ -32,7 +38,6 @@ namespace ltbl {
         static void clear(sf::RenderTarget &rt, const sf::Color &color);
 
         DynamicQuadtree _shapeQuadtree;
-        DynamicQuadtree _normalsQuadtree;
         DynamicQuadtree _lightPointEmissionQuadtree;
 
         std::unordered_set<std::shared_ptr<LightPointEmission>> _pointEmissionLights;
@@ -48,6 +53,7 @@ namespace ltbl {
         float _directionEmissionRange;
         float _directionEmissionRadiusMultiplier;
         sf::Color _ambientColor;
+        bool _normalsEnabled = false;
 
         LightSystem()
             : _directionEmissionRange(10000.0f), _directionEmissionRadiusMultiplier(1.1f), _ambientColor(sf::Color(16, 16, 16))
@@ -78,10 +84,6 @@ namespace ltbl {
         void removeLight(const std::shared_ptr<LightPointEmission> &pointEmissionLight);
         void removeLight(const std::shared_ptr<LightDirectionEmission> &directionEmissionLight);
 
-        void addNormals(const std::shared_ptr<NormalsSprite>& normalsSprite);
-
-        void removeNormals(const std::shared_ptr<NormalsSprite>& normalsSprite);
-
         void trimLightPointEmissionQuadtree() {
             _lightPointEmissionQuadtree.trim();
         }
@@ -94,8 +96,22 @@ namespace ltbl {
             return _compositionTexture.getTexture();
         }
 
-        friend class LightPointEmission;
-        friend class LightDirectionEmission;
-        friend class LightShape;
+        //----- Normals -----//
+
+        //! Whether the light system should consider the normals target.
+        void normalsEnabled(bool enabled);
+
+        //! Set the normals texture view.
+        void normalsTargetSetView(sf::View view);
+
+        //! Clear the normals texture.
+        void normalsTargetClear();
+
+        //! Display the normals target.
+        void normalsTargetDisplay();
+
+        //! Draw a sf::Drawable (usually a Sprite containing the normals texture) into the texture target.
+        // TODO Probably need to add the sf::RenderStates to get the transform
+        void normalsTargetDraw(const sf::Drawable& drawable);
     };
 }

@@ -23,7 +23,8 @@ namespace ltbl {
 
         void render(const sf::View& view,
                     sf::RenderTexture& lightTempTexture, sf::RenderTexture& emissionTempTexture, sf::RenderTexture& antumbraTempTexture,
-                    const std::vector<QuadtreeOccupant*>& shapes, const std::vector<QuadtreeOccupant*>& normalsSprites,
-                    sf::Shader& unshadowShader, sf::Shader& lightOverShapeShader, sf::Shader& normalsShader);
+                    const std::vector<QuadtreeOccupant*>& shapes,
+                    sf::Shader& unshadowShader, sf::Shader& lightOverShapeShader,
+                    bool normalsEnabled, sf::Shader& normalsShader);
     };
 }

@@ -26,6 +26,7 @@ int main(void)
 
     ltbl::LightSystem ls;
     ls.create(sf::FloatRect{{0.f, 0.f}, view.getSize()}, window.getSize(), penumbraTexture, unshadowShader, lightOverShapeShader, normalsShader);
+    ls.normalsEnabled(true);
 
     //----- Add a light
 

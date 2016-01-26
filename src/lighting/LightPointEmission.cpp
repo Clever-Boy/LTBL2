@@ -10,20 +10,17 @@
 
 using namespace ltbl;
 
-void LightPointEmission::render(const sf::View &view,
-                                sf::RenderTexture &lightTempTexture, sf::RenderTexture &emissionTempTexture, sf::RenderTexture &antumbraTempTexture,
-                                const std::vector<QuadtreeOccupant*> &shapes, const std::vector<QuadtreeOccupant*>& normalsSprites,
-                                sf::Shader &unshadowShader, sf::Shader &lightOverShapeShader, sf::Shader &normalsShader)
+void LightPointEmission::render(const sf::View& view,
+                                sf::RenderTexture& lightTempTexture, sf::RenderTexture& emissionTempTexture, sf::RenderTexture& antumbraTempTexture,
+                                const std::vector<QuadtreeOccupant*>& shapes,
+                                sf::Shader& unshadowShader, sf::Shader& lightOverShapeShader,
+                                bool normalsEnabled, sf::Shader& normalsShader)
 {
     LightSystem::clear(emissionTempTexture, sf::Color::Black);
 
     emissionTempTexture.setView(view);
     emissionTempTexture.draw(_emissionSprite);
     emissionTempTexture.display();
-
-    LightSystem::clear(lightTempTexture, sf::Color::Black);
-    lightTempTexture.setView(view);
-    lightTempTexture.draw(_emissionSprite);
 
     sf::Transform t;
     t.translate(_emissionSprite.getPosition());
@@ -50,6 +47,32 @@ void LightPointEmission::render(const sf::View &view,
 
     sf::RenderStates antumbraRenderStates;
     antumbraRenderStates.blendMode = sf::BlendMultiply;
+
+    //----- Emission
+
+    LightSystem::clear(lightTempTexture, sf::Color::Black);
+    lightTempTexture.setView(view);
+
+    if (normalsEnabled) {
+        auto oglLightPosition = lightTempTexture.mapCoordsToPixel(_emissionSprite.getPosition());
+        normalsShader.setParameter("lightPosition", oglLightPosition.x, lightTempTexture.getSize().y - oglLightPosition.y, 0.15f);
+
+        const auto& lightColor = _emissionSprite.getColor();
+        sf::Vector3f oglLightColor{lightColor.r / 255.f, lightColor.g / 255.f, lightColor.b / 255.f};
+        normalsShader.setParameter("lightColor", oglLightColor);
+
+        // TODO Having a better interface for emission sprite settings would make us able to precompute and stores these values
+        auto oglLightWidthPos = lightTempTexture.mapCoordsToPixel({getAABB().width, 0.f});
+        auto oglLightHeightPos = lightTempTexture.mapCoordsToPixel({0.f, getAABB().height});
+        float oglLightWidth = std::sqrt(oglLightWidthPos.x * oglLightWidthPos.x + oglLightWidthPos.y * oglLightWidthPos.y);
+        float oglLightHeight = std::sqrt(oglLightHeightPos.x * oglLightHeightPos.x + oglLightHeightPos.y * oglLightHeightPos.y);
+        normalsShader.setParameter("lightSize", oglLightWidth, oglLightHeight);
+
+        lightTempTexture.draw(_emissionSprite, &normalsShader);
+    }
+    else {
+        lightTempTexture.draw(_emissionSprite);
+    }
 
     //----- Shapes
 
@@ -216,34 +239,6 @@ void LightPointEmission::render(const sf::View &view,
             pLightShape->_shape.setFillColor(sf::Color::Black);
 
             lightTempTexture.draw(pLightShape->_shape);
-        }
-    }
-
-    //----- Normals
-
-    auto normalsSpritesCount = normalsSprites.size();
-    if (normalsSpritesCount != 0u) {
-        auto lightPosition = lightTempTexture.mapCoordsToPixel(_emissionSprite.getPosition());
-        normalsShader.setParameter("lightPosition", lightPosition.x, lightTempTexture.getSize().y - lightPosition.y, 0.075f);
-
-        const auto& lightColor = _emissionSprite.getColor();
-        sf::Vector3f oglLightColor{lightColor.r / 255.f, lightColor.g / 255.f, lightColor.b / 255.f};
-        normalsShader.setParameter("lightColor", oglLightColor);
-
-        normalsShader.setParameter("lightTexture", *_emissionSprite.getTexture());
-
-        // TODO Having a better interface for emission sprite settings would make us able to precompute and stores these values
-        auto oglLightWidthPos = lightTempTexture.mapCoordsToPixel({getAABB().width, 0.f});
-        auto oglLightHeightPos = lightTempTexture.mapCoordsToPixel({0.f, getAABB().height});
-        float oglLightWidth = std::sqrt(oglLightWidthPos.x * oglLightWidthPos.x + oglLightWidthPos.y * oglLightWidthPos.y);
-        float oglLightHeight = std::sqrt(oglLightHeightPos.x * oglLightHeightPos.x + oglLightHeightPos.y * oglLightHeightPos.y);
-        normalsShader.setParameter("lightSize", oglLightWidth, oglLightHeight);
-
-        for (unsigned i = 0u; i < normalsSpritesCount; i++) {
-            auto pNormalsSprite = static_cast<NormalsSprite*>(normalsSprites[i]);
-            const auto& textureSize = pNormalsSprite->_normalsSprite.getTexture()->getSize();
-            normalsShader.setParameter("textureSize", textureSize.x, textureSize.y);
-            lightTempTexture.draw(pNormalsSprite->_normalsSprite, &normalsShader);
         }
     }
 

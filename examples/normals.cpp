@@ -26,44 +26,56 @@ int main(void)
 
     ltbl::LightSystem ls;
     ls.create(sf::FloatRect{{0.f, 0.f}, view.getSize()}, window.getSize(), penumbraTexture, unshadowShader, lightOverShapeShader, normalsShader);
+    ls.normalsTargetSetView(view);
+    ls.normalsEnabled(true);
 
     //----- Add a light
 
-    sf::CircleShape pointLight(4.f);
-    pointLight.setFillColor(sf::Color::Blue);
-    pointLight.setOrigin(0.5f * pointLight.getLocalBounds().width, 0.5f * pointLight.getLocalBounds().height);
+    sf::CircleShape pointLightImage(4.f);
+    pointLightImage.setFillColor(sf::Color::Blue);
+    pointLightImage.setOrigin(0.5f * pointLightImage.getLocalBounds().width, 0.5f * pointLightImage.getLocalBounds().height);
 
     sf::Texture pointLightTexture;
     pointLightTexture.loadFromFile("assets/pointLightTexture.png");
     pointLightTexture.setSmooth(true);
 
-    auto light = std::make_shared<ltbl::LightPointEmission>();
-    light->_emissionSprite.setOrigin(pointLightTexture.getSize().x * 0.5f, pointLightTexture.getSize().y * 0.5f);
-    light->_emissionSprite.setTexture(pointLightTexture);
-    light->_emissionSprite.setScale(10.0f, 10.0f);
-    light->_emissionSprite.setColor({255u, 230u, 200u});
-    light->_emissionSprite.setPosition(100.0f, 100.0f);
-    ls.addLight(light);
+    auto pointLight = std::make_shared<ltbl::LightPointEmission>();
+    pointLight->_emissionSprite.setOrigin(pointLightTexture.getSize().x * 0.5f, pointLightTexture.getSize().y * 0.5f);
+    pointLight->_emissionSprite.setTexture(pointLightTexture);
+    pointLight->_emissionSprite.setScale(15.0f, 15.0f);
+    pointLight->_emissionSprite.setColor({255u, 230u, 200u});
+    pointLight->_emissionSprite.setPosition(100.0f, 100.0f);
+    ls.addLight(pointLight);
 
     //----- Add a texture with normal mapping
 
+    // A head
     sf::Texture headTexture;
     headTexture.loadFromFile("resources/head.png");
     headTexture.setSmooth(true);
     sf::Vector2f headTextureSize(headTexture.getSize().x, headTexture.getSize().y);
 
+    sf::Texture headNormalsTexture;
+    headNormalsTexture.loadFromFile("resources/head_NORMALS.png");
+
     sf::Sprite head(headTexture);
     head.setOrigin(headTextureSize / 2.f);
     head.setPosition(view.getCenter());
 
-    sf::Texture headNormalsTexture;
-    headNormalsTexture.loadFromFile("resources/head_NORMALS.png");
+    // A background
+    sf::Texture backgroundTexture;
+    backgroundTexture.loadFromFile("resources/background.png");
+    backgroundTexture.setSmooth(true);
+    backgroundTexture.setRepeated(true);
 
-    auto headNormals = std::make_shared<ltbl::NormalsSprite>();
-    headNormals->_normalsSprite.setTexture(headNormalsTexture);
-    headNormals->_normalsSprite.setOrigin(head.getOrigin());
-    headNormals->_normalsSprite.setPosition(head.getPosition());
-    ls.addNormals(headNormals);
+    sf::Texture backgroundNormalsTexture;
+    backgroundNormalsTexture.loadFromFile("resources/background_NORMALS.png");
+    backgroundNormalsTexture.setRepeated(true);
+
+    sf::RectangleShape background;
+    background.setTexture(&backgroundTexture);
+    background.setSize({1280.f, 720.f});
+    background.setTextureRect({0, 0, 1280, 720});
 
     //----- Program loop
 
@@ -79,8 +91,8 @@ int main(void)
                 break;
 
             case sf::Event::MouseMoved:
-                light->_emissionSprite.setPosition(event.mouseMove.x, event.mouseMove.y);
-                pointLight.setPosition(event.mouseMove.x, event.mouseMove.y);
+                pointLight->_emissionSprite.setPosition(event.mouseMove.x, event.mouseMove.y);
+                pointLightImage.setPosition(event.mouseMove.x, event.mouseMove.y);
                 break;
 
             case sf::Event::KeyPressed:
@@ -93,19 +105,32 @@ int main(void)
             }
         }
 
-        // Normal rendering
+        // Rendering
 
         window.clear(sf::Color::White);
+        ls.normalsTargetClear();
+
+        background.setTexture(&backgroundTexture);
+        window.draw(background);
+        background.setTexture(&backgroundNormalsTexture);
+        ls.normalsTargetDraw(background);
+
+        head.setTexture(headTexture);
         window.draw(head);
-        window.draw(pointLight);
+        head.setTexture(headNormalsTexture);
+        ls.normalsTargetDraw(head);
+
+        window.draw(pointLightImage);
 
         // Lighting rendering
 
+        ls.normalsTargetDisplay();
         ls.render(view, unshadowShader, lightOverShapeShader, normalsShader);
+
+        // Mix lighting with plain image
 
         sf::Sprite sprite(ls.getLightingTexture());
         window.draw(sprite, lightRenderStates);
-
         window.display();
     }
 
