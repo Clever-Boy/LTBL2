@@ -761,7 +761,7 @@ void LightSystem::normalsTargetDisplay()
     _normalsTexture.display();
 }
 
-void LightSystem::normalsTargetDraw(const sf::Drawable& drawable)
+void LightSystem::normalsTargetDraw(const sf::Drawable& drawable, sf::RenderStates states)
 {
-    _normalsTexture.draw(drawable);
+    _normalsTexture.draw(drawable, states);
 }

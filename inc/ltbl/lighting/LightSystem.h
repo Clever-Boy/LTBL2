@@ -111,7 +111,6 @@ namespace ltbl
         void normalsTargetDisplay();
 
         //! Draw a sf::Drawable (usually a Sprite containing the normals texture) into the texture target.
-        // TODO Probably need to add the sf::RenderStates to get the transform
-        void normalsTargetDraw(const sf::Drawable& drawable);
+        void normalsTargetDraw(const sf::Drawable& drawable, sf::RenderStates states = sf::RenderStates());
     };
 }

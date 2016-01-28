@@ -22,13 +22,7 @@ void LightPointEmission::render(const sf::View& view,
     emissionTempTexture.draw(_emissionSprite);
     emissionTempTexture.display();
 
-    sf::Transform t;
-    t.translate(_emissionSprite.getPosition());
-    t.rotate(_emissionSprite.getRotation());
-    t.scale(_emissionSprite.getScale());
-
-    sf::Vector2f castCenter = t.transformPoint(_localCastCenter);
-
+    sf::Vector2f castCenter = _emissionSprite.getTransform().transformPoint(_localCastCenter);
     float shadowExtension = _shadowOverExtendMultiplier * (getAABB().width + getAABB().height);
 
     struct OuterEdges {
@@ -55,15 +49,17 @@ void LightPointEmission::render(const sf::View& view,
 
     if (normalsEnabled) {
         auto oglLightPosition = lightTempTexture.mapCoordsToPixel(_emissionSprite.getPosition());
-        normalsShader.setParameter("lightPosition", oglLightPosition.x, lightTempTexture.getSize().y - oglLightPosition.y, 0.15f);
+        normalsShader.setParameter("lightPosition", oglLightPosition.x, static_cast<int>(lightTempTexture.getSize().y - oglLightPosition.y), 0.15f);
 
         const auto& lightColor = _emissionSprite.getColor();
         sf::Vector3f oglLightColor{lightColor.r / 255.f, lightColor.g / 255.f, lightColor.b / 255.f};
         normalsShader.setParameter("lightColor", oglLightColor);
 
         // TODO Having a better interface for emission sprite settings would make us able to precompute and stores these values
-        auto oglLightWidthPos = lightTempTexture.mapCoordsToPixel({getAABB().width, 0.f});
-        auto oglLightHeightPos = lightTempTexture.mapCoordsToPixel({0.f, getAABB().height});
+        // But all that depends on the view
+        auto oglOrigin = lightTempTexture.mapCoordsToPixel({0.f, 0.f});
+        auto oglLightWidthPos = lightTempTexture.mapCoordsToPixel({getAABB().width, 0.f}) - oglOrigin;
+        auto oglLightHeightPos = lightTempTexture.mapCoordsToPixel({0.f, getAABB().height}) - oglOrigin;
         float oglLightWidth = std::sqrt(oglLightWidthPos.x * oglLightWidthPos.x + oglLightWidthPos.y * oglLightWidthPos.y);
         float oglLightHeight = std::sqrt(oglLightHeightPos.x * oglLightHeightPos.x + oglLightHeightPos.y * oglLightHeightPos.y);
         normalsShader.setParameter("lightSize", oglLightWidth, oglLightHeight);
