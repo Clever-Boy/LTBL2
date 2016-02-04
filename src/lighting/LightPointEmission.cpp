@@ -22,7 +22,12 @@ void LightPointEmission::render(const sf::View& view,
     emissionTempTexture.draw(_emissionSprite);
     emissionTempTexture.display();
 
-    sf::Vector2f castCenter = _emissionSprite.getTransform().transformPoint(_localCastCenter);
+    // Note: We don't want origin from _emissionSprite.getTransform,
+    // as the center point is the origin itself.
+    sf::Transform t = _emissionSprite.getTransform();
+    t.translate(_emissionSprite.getOrigin());
+    sf::Vector2f castCenter = t.transformPoint(_localCastCenter);
+
     float shadowExtension = _shadowOverExtendMultiplier * (getAABB().width + getAABB().height);
 
     struct OuterEdges {
