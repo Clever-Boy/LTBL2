@@ -16,8 +16,7 @@ void LightPointEmission::render(const sf::View& view,
                                 sf::Shader& unshadowShader, sf::Shader& lightOverShapeShader,
                                 bool normalsEnabled, sf::Shader& normalsShader)
 {
-    LightSystem::clear(emissionTempTexture, sf::Color::Black);
-
+    emissionTempTexture.clear();
     emissionTempTexture.setView(view);
     emissionTempTexture.draw(_emissionSprite);
     emissionTempTexture.display();
@@ -49,7 +48,7 @@ void LightPointEmission::render(const sf::View& view,
 
     //----- Emission
 
-    LightSystem::clear(lightTempTexture, sf::Color::Black);
+    lightTempTexture.clear();
     lightTempTexture.setView(view);
 
     if (normalsEnabled) {
@@ -111,8 +110,7 @@ void LightPointEmission::render(const sf::View& view,
             sf::Vector2f adi = innerBoundaryVectors[0];
             sf::Vector2f bdi = innerBoundaryVectors[1];
 
-            LightSystem::clear(antumbraTempTexture, sf::Color::White);
-
+            antumbraTempTexture.clear(sf::Color::White);
             antumbraTempTexture.setView(view);
 
             sf::Vector2f intersectionInner;

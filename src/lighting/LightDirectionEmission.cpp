@@ -11,7 +11,7 @@ using namespace ltbl;
 void LightDirectionEmission::render(const sf::View &view, sf::RenderTexture &lightTempTexture, sf::RenderTexture &antumbraTempTexture, const std::vector<QuadtreeOccupant*> &shapes, sf::Shader &unshadowShader, float shadowExtension) {
     lightTempTexture.setView(view);
 
-    LightSystem::clear(lightTempTexture, sf::Color::White);
+    lightTempTexture.clear(sf::Color::White);
 
     // Mask off light shape (over-masking - mask too much, reveal penumbra/antumbra afterwards)
     for (int i = 0; i < shapes.size(); i++) {
@@ -29,8 +29,7 @@ void LightDirectionEmission::render(const sf::View &view, sf::RenderTexture &lig
         if (innerBoundaryIndices.size() != 2 || outerBoundaryIndices.size() != 2)
             continue;
 
-        LightSystem::clear(antumbraTempTexture, sf::Color::White);
-
+        antumbraTempTexture.clear(sf::Color::White);
         antumbraTempTexture.setView(view);
 
         sf::ConvexShape maskShape;

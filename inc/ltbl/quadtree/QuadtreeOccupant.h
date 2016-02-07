@@ -3,31 +3,31 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
-#include <ltbl/Math.h>
+#include <ltbl/tools/Math.h>
 
 #include <memory>
 #include <array>
 #include <unordered_set>
 
 namespace ltbl {
-	class QuadtreeOccupant {
-		friend class Quadtree;
-		friend class QuadtreeNode;
-		friend class DynamicQuadtree;
-		friend class StaticQuadtree;
-		
-	private:
-		class QuadtreeNode* _pQuadtreeNode;
-		class Quadtree* _pQuadtree;
+    class QuadtreeOccupant {
+        friend class Quadtree;
+        friend class QuadtreeNode;
+        friend class DynamicQuadtree;
+        friend class StaticQuadtree;
 
-	public:
-		QuadtreeOccupant()
-			: _pQuadtreeNode(nullptr), _pQuadtree(nullptr)
-		{}
+    private:
+        class QuadtreeNode* _pQuadtreeNode;
+        class Quadtree* _pQuadtree;
 
-		void quadtreeUpdate();
-		void quadtreeRemove();
+    public:
+        QuadtreeOccupant()
+            : _pQuadtreeNode(nullptr), _pQuadtree(nullptr)
+        {}
 
-		virtual sf::FloatRect getAABB() const = 0;
-	};
+        void quadtreeUpdate();
+        void quadtreeRemove();
+
+        virtual sf::FloatRect getAABB() const = 0;
+    };
 }

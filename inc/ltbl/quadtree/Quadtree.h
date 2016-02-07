@@ -13,47 +13,45 @@
 namespace ltbl {
     class QuadtreeOccupant;
 
-	// Base class for dynamic and static Quadtree types
-	class Quadtree {
-		friend class QuadtreeOccupant;
-		friend class QuadtreeNode;
-		friend class SceneObject;
-		
-	protected:
-		std::unordered_set<QuadtreeOccupant*> _outsideRoot;
+    // Base class for dynamic and static Quadtree types
+    class Quadtree {
+        friend class QuadtreeOccupant;
+        friend class QuadtreeNode;
+        friend class SceneObject;
 
-		std::unique_ptr<QuadtreeNode> _pRootNode;
+    protected:
+        std::unordered_set<QuadtreeOccupant*> _outsideRoot;
 
-		// Called whenever something is removed, an action can be defined by derived classes
-		// Defaults to doing nothing
-		virtual void onRemoval() {}
+        std::unique_ptr<QuadtreeNode> _pRootNode;
 
-		void setQuadtree(QuadtreeOccupant* oc);
+        // Called whenever something is removed, an action can be defined by derived classes
+        // Defaults to doing nothing
+        virtual void onRemoval() {}
 
-		void recursiveCopy(QuadtreeNode* pThisNode, QuadtreeNode* pOtherNode, QuadtreeNode* pThisParent);
+        void setQuadtree(QuadtreeOccupant* oc);
 
-	public:
-		size_t _minNumNodeOccupants;
-		size_t _maxNumNodeOccupants;
-		size_t _maxLevels;
+        void recursiveCopy(QuadtreeNode* pThisNode, QuadtreeNode* pOtherNode, QuadtreeNode* pThisParent);
 
-		float _oversizeMultiplier;
+    public:
+        size_t _minNumNodeOccupants;
+        size_t _maxNumNodeOccupants;
+        size_t _maxLevels;
 
-		Quadtree();
-		Quadtree(const Quadtree &other) {
-			*this = other;
-		}
+        float _oversizeMultiplier;
 
-		virtual ~Quadtree() {}
+        Quadtree();
+        Quadtree(const Quadtree &other) {
+            *this = other;
+        }
 
-		void operator=(const Quadtree &other);
+        virtual ~Quadtree() {}
 
-		virtual void add(QuadtreeOccupant* oc) = 0;
+        void operator=(const Quadtree &other);
 
-		void pruneDeadReferences();
+        virtual void add(QuadtreeOccupant* oc) = 0;
 
-		void queryRegion(std::vector<QuadtreeOccupant*> &result, const sf::FloatRect &region);
-		void queryPoint(std::vector<QuadtreeOccupant*> &result, const sf::Vector2f &p);
-		void queryShape(std::vector<QuadtreeOccupant*> &result, const sf::ConvexShape &shape);
-	};
+        void queryRegion(std::vector<QuadtreeOccupant*> &result, const sf::FloatRect &region);
+        void queryPoint(std::vector<QuadtreeOccupant*> &result, const sf::Vector2f &p);
+        void queryShape(std::vector<QuadtreeOccupant*> &result, const sf::ConvexShape &shape);
+    };
 }

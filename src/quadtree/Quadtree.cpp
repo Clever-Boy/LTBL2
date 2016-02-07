@@ -51,17 +51,6 @@ void Quadtree::recursiveCopy(QuadtreeNode* pThisNode, QuadtreeNode* pOtherNode, 
         }
 }
 
-void Quadtree::pruneDeadReferences() {
-    for (std::unordered_set<QuadtreeOccupant*>::iterator it = _outsideRoot.begin(); it != _outsideRoot.end();)
-        if ((*it) == nullptr)
-            it++;
-        else
-            it = _outsideRoot.erase(it);
-
-    if (_pRootNode != nullptr)
-        _pRootNode->pruneDeadReferences();
-}
-
 void Quadtree::queryRegion(std::vector<QuadtreeOccupant*> &result, const sf::FloatRect &region) {
     // Query outside root elements
     for (auto oc : _outsideRoot) {

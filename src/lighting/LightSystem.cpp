@@ -585,15 +585,6 @@ void LightSystem::getPenumbrasDirection(std::vector<Penumbra> &penumbras, std::v
         }
     }
 }
-void LightSystem::clear(sf::RenderTarget &rt, const sf::Color &color) {
-    sf::RectangleShape shape;
-    shape.setSize(sf::Vector2f(rt.getSize().x, rt.getSize().y));
-    shape.setFillColor(color);
-    sf::View v = rt.getView();
-    rt.setView(rt.getDefaultView());
-    rt.draw(shape);
-    rt.setView(v);
-}
 
 void LightSystem::create(const sf::FloatRect& rootRegion, const sf::Vector2u& imageSize,
                          const sf::Texture& penumbraTexture,
@@ -624,7 +615,7 @@ void LightSystem::create(const sf::FloatRect& rootRegion, const sf::Vector2u& im
 
 void LightSystem::render(const sf::View &view, sf::Shader &unshadowShader, sf::Shader &lightOverShapeShader, sf::Shader& normalsShader)
 {
-    clear(_compositionTexture, _ambientColor);
+    _compositionTexture.clear(_ambientColor);
     _compositionTexture.setView(_compositionTexture.getDefaultView());
 
     // Get bounding rectangle of view
@@ -657,8 +648,6 @@ void LightSystem::render(const sf::View &view, sf::Shader &unshadowShader, sf::S
         lightShapes.clear();
         _shapeQuadtree.queryRegion(lightShapes, pPointEmissionLight->getAABB());
 
-        // TODO Normals
-        // TODO Remove normals shader
         pPointEmissionLight->render(view, _lightTempTexture, _emissionTempTexture, _antumbraTempTexture, lightShapes, unshadowShader, lightOverShapeShader, _normalsEnabled, normalsShader);
         _compositionTexture.draw(lightTempSprite, compoRenderStates);
     }

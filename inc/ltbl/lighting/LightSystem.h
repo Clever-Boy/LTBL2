@@ -6,7 +6,7 @@
 #include <ltbl/lighting/LightShape.h>
 #include <ltbl/lighting/NormalsSprite.h>
 
-#include <pool/pool.h>
+#include <ltbl/tools/pool.h>
 
 #include <unordered_set>
 
@@ -34,8 +34,6 @@ namespace ltbl
 
         static void getPenumbrasPoint(std::vector<Penumbra> &penumbras, std::vector<int> &innerBoundaryIndices, std::vector<sf::Vector2f> &innerBoundaryVectors, std::vector<int> &outerBoundaryIndices, std::vector<sf::Vector2f> &outerBoundaryVectors, const sf::ConvexShape &shape, const sf::Vector2f &sourceCenter, float sourceRadius);
         static void getPenumbrasDirection(std::vector<Penumbra> &penumbras, std::vector<int> &innerBoundaryIndices, std::vector<sf::Vector2f> &innerBoundaryVectors, std::vector<int> &outerBoundaryIndices, std::vector<sf::Vector2f> &outerBoundaryVectors, const sf::ConvexShape &shape, const sf::Vector2f &sourceDirection, float sourceRadius, float sourceDistance);
-
-        static void clear(sf::RenderTarget &rt, const sf::Color &color);
 
         DynamicQuadtree _shapeQuadtree;
         DynamicQuadtree _lightPointEmissionQuadtree;

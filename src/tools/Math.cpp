@@ -1,4 +1,4 @@
-#include <ltbl/Math.h>
+#include <ltbl/tools/Math.h>
 
 #include <list>
 

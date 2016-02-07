@@ -86,8 +86,8 @@ void DynamicQuadtree::expand() {
     std::unordered_set<QuadtreeOccupant*> outsideRootCopy(_outsideRoot);
     _outsideRoot.clear();
 
-    for (std::unordered_set<QuadtreeOccupant*>::iterator it = outsideRootCopy.begin(); it != outsideRootCopy.end(); it++)
-        add(*it);
+    for (auto& occupant : outsideRootCopy)
+        add(occupant);
 }
 
 void DynamicQuadtree::contract() {

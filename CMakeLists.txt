@@ -56,7 +56,7 @@ set(ltbl_src
     src/lighting/LightDirectionEmission.cpp
     src/lighting/LightPointEmission.cpp
     src/lighting/LightSystem.cpp
-    src/Math.cpp
+    src/tools/Math.cpp
     src/quadtree/DynamicQuadtree.cpp
     src/quadtree/Quadtree.cpp
     src/quadtree/QuadtreeNode.cpp
