@@ -4,13 +4,6 @@
 
 using namespace ltbl;
 
-void DynamicQuadtree::operator=(const DynamicQuadtree &other) {
-    Quadtree::operator=(other);
-
-    _minOutsideRoot = other._minOutsideRoot;
-    _maxOutsideRoot = other._maxOutsideRoot;
-}
-
 void DynamicQuadtree::add(QuadtreeOccupant* oc) {
     assert(created());
 

@@ -7,79 +7,77 @@
 #include <unordered_set>
 
 namespace ltbl {
-	class QuadtreeNode : public sf::NonCopyable {
-	private:
-		QuadtreeNode* _pParent;
-		class Quadtree* _pQuadtree;
+    class QuadtreeNode : public sf::NonCopyable {
 
-		bool _hasChildren;
+        friend class QuadtreeOccupant;
+        friend class Quadtree;
+        friend class DynamicQuadtree;
 
-		std::array<std::unique_ptr<QuadtreeNode>, 4> _children;
+    private:
+        QuadtreeNode* _pParent;
+        class Quadtree* _pQuadtree;
 
-		std::unordered_set<QuadtreeOccupant*> _occupants;
+        bool _hasChildren = false;
 
-		sf::FloatRect _region;
+        std::array<std::unique_ptr<QuadtreeNode>, 4> _children;
+        std::unordered_set<QuadtreeOccupant*> _occupants;
 
-		int _level;
+        sf::FloatRect _region;
 
-		int _numOccupantsBelow;
+        int _level;
 
-		void getPossibleOccupantPosition(QuadtreeOccupant* oc, sf::Vector2i &point);
+        int _numOccupantsBelow = 0;
 
-		void addToThisLevel(QuadtreeOccupant* oc);
+        void getPossibleOccupantPosition(QuadtreeOccupant* oc, sf::Vector2i &point);
 
-		// Returns true if occupant was added to children
-		bool addToChildren(QuadtreeOccupant* oc);
+        void addToThisLevel(QuadtreeOccupant* oc);
 
-		void destroyChildren() {
-			for (int i = 0; i < 4; i++)
-				_children[i].reset();
+        // Returns true if occupant was added to children
+        bool addToChildren(QuadtreeOccupant* oc);
 
-			_hasChildren = false;
-		}
+        void destroyChildren() {
+            for (int i = 0; i < 4; i++)
+                _children[i].reset();
 
-		void getOccupants(std::unordered_set<QuadtreeOccupant*> &occupants);
+            _hasChildren = false;
+        }
 
-		void partition();
+        void getOccupants(std::unordered_set<QuadtreeOccupant*> &occupants);
 
-		void merge();
+        void partition();
 
-		void update(QuadtreeOccupant* oc);
-		void remove(QuadtreeOccupant* oc);
+        void merge();
 
-		void removeForDeletion(std::unordered_set<QuadtreeOccupant*> &occupants);
+        void update(QuadtreeOccupant* oc);
+        void remove(QuadtreeOccupant* oc);
 
-	public:
-		QuadtreeNode()
-			: _hasChildren(false), _numOccupantsBelow(0)
-		{}
+        void removeForDeletion(std::unordered_set<QuadtreeOccupant*> &occupants);
 
-		QuadtreeNode(const sf::FloatRect &region, int level, QuadtreeNode* pParent, class Quadtree* pQuadtree);
+    public:
+        QuadtreeNode()
+            : _hasChildren(false), _numOccupantsBelow(0)
+        {}
 
-		// For use after using default constructor
-		void create(const sf::FloatRect &region, int level, QuadtreeNode* pParent, class Quadtree* pQuadtree);
+        QuadtreeNode(const sf::FloatRect &region, int level, QuadtreeNode* pParent, class Quadtree* pQuadtree);
 
-		class Quadtree* getTree() const {
-			return _pQuadtree;
-		}
+        // For use after using default constructor
+        void create(const sf::FloatRect &region, int level, QuadtreeNode* pParent, class Quadtree* pQuadtree);
 
-		void add(QuadtreeOccupant* oc);
+        class Quadtree* getTree() const {
+            return _pQuadtree;
+        }
 
-		const sf::FloatRect &getRegion() const {
-			return _region;
-		}
+        void add(QuadtreeOccupant* oc);
 
-		void getAllOccupantsBelow(std::vector<QuadtreeOccupant*> &occupants);
-		void getAllOccupantsBelow(std::unordered_set<QuadtreeOccupant*> &occupants);
+        const sf::FloatRect &getRegion() const {
+            return _region;
+        }
 
-		int getNumOccupantsBelow() const {
-			return _numOccupantsBelow;
-		}
+        void getAllOccupantsBelow(std::vector<QuadtreeOccupant*> &occupants);
+        void getAllOccupantsBelow(std::unordered_set<QuadtreeOccupant*> &occupants);
 
-		void pruneDeadReferences();
-
-		friend class QuadtreeOccupant;
-		friend class Quadtree;
-		friend class DynamicQuadtree;
-	};
+        int getNumOccupantsBelow() const {
+            return _numOccupantsBelow;
+        }
+    };
 }

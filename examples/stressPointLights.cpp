@@ -47,7 +47,7 @@ int main(void)
         light->_emissionSprite.setTexture(pointLightTexture);
         float scale = 0.3f + (rand() % 40) / 10.f;
         light->_emissionSprite.setScale(scale, scale);
-        light->_emissionSprite.setColor({rand() % 256, rand() % 256, rand() % 256});
+        light->_emissionSprite.setColor({static_cast<sf::Uint8>(rand() % 256), static_cast<sf::Uint8>(rand() % 256), static_cast<sf::Uint8>(rand() % 256)});
         light->_emissionSprite.setPosition(rand() % screenSize.x, rand() % screenSize.y);
         ls.addLight(light);
     }

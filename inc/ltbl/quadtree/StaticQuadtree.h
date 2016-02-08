@@ -2,40 +2,33 @@
 
 #include <ltbl/quadtree/Quadtree.h>
 
-namespace ltbl {
-	class StaticQuadtree : public Quadtree
-	{
-	public:
-		StaticQuadtree() {}
-		StaticQuadtree(const sf::FloatRect &rootRegion) {
-			_pRootNode.reset(new QuadtreeNode(rootRegion, 0, nullptr, this));
-		}
+namespace ltbl
+{
+    class StaticQuadtree : public Quadtree
+    {
+    public:
+        StaticQuadtree() {}
+        StaticQuadtree(const sf::FloatRect &rootRegion) {
+            _pRootNode.reset(new QuadtreeNode(rootRegion, 0, nullptr, this));
+        }
 
-		StaticQuadtree(const StaticQuadtree &other) {
-			*this = other;
-		}
+        void create(const sf::FloatRect &rootRegion) {
+            _pRootNode.reset(new QuadtreeNode(rootRegion, 0, nullptr, this));
+        }
 
-		void operator=(const StaticQuadtree &other) {
-			Quadtree::operator=(other);
-		}
+        // Inherited from Quadtree
+        void add(QuadtreeOccupant* oc);
 
-		void create(const sf::FloatRect &rootRegion) {
-			_pRootNode.reset(new QuadtreeNode(rootRegion, 0, nullptr, this));
-		}
+        void clear() {
+            _pRootNode.reset();
+        }
 
-		// Inherited from Quadtree
-		void add(QuadtreeOccupant* oc);
+        const sf::FloatRect &getRootRegion() const {
+            return _pRootNode->getRegion();
+        }
 
-		void clear() {
-			_pRootNode.reset();
-		}
-
-		const sf::FloatRect &getRootRegion() const {
-			return _pRootNode->getRegion();
-		}
-
-		bool created() const {
-			return _pRootNode != nullptr;
-		}
-	};
+        bool created() const {
+            return _pRootNode != nullptr;
+        }
+    };
 }

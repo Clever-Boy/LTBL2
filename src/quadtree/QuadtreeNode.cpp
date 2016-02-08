@@ -7,9 +7,10 @@
 using namespace ltbl;
 
 QuadtreeNode::QuadtreeNode(const sf::FloatRect &region, int level, QuadtreeNode* pParent, Quadtree* pQuadtree)
-    : _hasChildren(false),
-      _region(region), _level(level), _pParent(pParent), _pQuadtree(pQuadtree),
-      _numOccupantsBelow(0)
+    : _pParent(pParent)
+    , _pQuadtree(pQuadtree)
+    , _region(region)
+    , _level(level)
 {}
 
 void QuadtreeNode::create(const sf::FloatRect &region, int level, QuadtreeNode* pParent, Quadtree* pQuadtree) {
@@ -250,7 +251,7 @@ void QuadtreeNode::remove(QuadtreeOccupant* oc) {
     while (pNode != nullptr) {
         pNode->_numOccupantsBelow--;
 
-        if (pNode->_numOccupantsBelow >= _pQuadtree->_minNumNodeOccupants) {
+        if (pNode->_numOccupantsBelow > 0 && static_cast<size_t>(pNode->_numOccupantsBelow) >= _pQuadtree->_minNumNodeOccupants) {
             pNode->merge();
 
             break;
@@ -272,7 +273,7 @@ void QuadtreeNode::add(QuadtreeOccupant* oc) {
     }
     else {
         // Check if we need a new partition
-        if (static_cast<signed>(_occupants.size()) >= _pQuadtree->_maxNumNodeOccupants && _level < _pQuadtree->_maxLevels) {
+        if (_occupants.size() >= _pQuadtree->_maxNumNodeOccupants && static_cast<size_t>(_level) < _pQuadtree->_maxLevels) {
             partition();
 
             if (addToChildren(oc))
@@ -282,17 +283,4 @@ void QuadtreeNode::add(QuadtreeOccupant* oc) {
 
     // Did not fit in anywhere, add to this level, even if it goes over the maximum size
     addToThisLevel(oc);
-}
-
-void QuadtreeNode::pruneDeadReferences() {
-    for (std::unordered_set<QuadtreeOccupant*>::iterator it = _occupants.begin(); it != _occupants.end();) {
-        if ((*it) == nullptr)
-            it++;
-        else
-            it = _occupants.erase(it);
-    }
-
-    if (_hasChildren)
-        for (int i = 0; i < 4; i++)
-            _children[i]->pruneDeadReferences();
 }

@@ -61,7 +61,7 @@ int main(void)
     for (unsigned i = 0u; i < SHAPES_COUNT; ++i) {
         blockers[i].setSize({10.f + (rand() % 30), 5.f + (rand() % 50)});
         blockers[i].setPosition(rand() % screenSize.x, rand() % screenSize.y);
-        blockers[i].setFillColor(sf::Color{rand() % 256, rand() % 256, rand() % 256});
+        blockers[i].setFillColor(sf::Color{static_cast<sf::Uint8>(rand() % 256), static_cast<sf::Uint8>(rand() % 256), static_cast<sf::Uint8>(rand() % 256)});
 
         auto lightBlocker = ls.allocateShape();
         lightBlocker->_shape.setPointCount(4u);

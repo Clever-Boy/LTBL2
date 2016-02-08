@@ -155,7 +155,7 @@ void LightPointEmission::render(const sf::View& view,
             penumbraRenderStates.shader = &unshadowShader;
 
             // Unmask with penumbras
-            for (int j = 0; j < penumbras.size(); j++) {
+            for (unsigned j = 0; j < penumbras.size(); j++) {
                 unshadowShader.setParameter("lightBrightness", penumbras[j]._lightBrightness);
                 unshadowShader.setParameter("darkBrightness", penumbras[j]._darkBrightness);
 
@@ -209,7 +209,7 @@ void LightPointEmission::render(const sf::View& view,
             penumbraRenderStates.shader = &unshadowShader;
 
             // Unmask with penumbras
-            for (int j = 0; j < penumbras.size(); j++) {
+            for (unsigned j = 0; j < penumbras.size(); j++) {
                 unshadowShader.setParameter("lightBrightness", penumbras[j]._lightBrightness);
                 unshadowShader.setParameter("darkBrightness", penumbras[j]._darkBrightness);
 
@@ -226,7 +226,7 @@ void LightPointEmission::render(const sf::View& view,
         }
     }
 
-    for (int i = 0; i < shapesCount; i++) {
+    for (unsigned i = 0; i < shapesCount; i++) {
         LightShape* pLightShape = static_cast<LightShape*>(shapes[i]);
 
         if (pLightShape->_renderLightOverShape) {
